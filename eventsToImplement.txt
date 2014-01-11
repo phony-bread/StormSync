@@ -1,0 +1,10 @@
+tame
+breakdoor
+creeperpower
+pigzap
+leash
+sheepwooldye
+playerdeath
+fish
+bedenter
+fire,fire_tick,lava

@@ -1,0 +1,16 @@
+name: Storm Sync
+main: frostbyte.plugins.stormsync.StormSync
+version: 1.0b
+description: This plugin weather to real world weather.
+author: _FrostByte_
+website: http://dev.bukkit.org/bukkit-plugins/storm-sync/
+permissions:
+    stormsync.stormsync:
+        description: Permission for the /stormsync command
+        default: op
+commands:
+    stormsync:
+        aliases: ss
+        description: version recites the version number, reload reloads the config
+        permission: stormsync.stormsync
+        
