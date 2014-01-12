@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,10 +23,13 @@ public class StormSync extends JavaPlugin
 {
     private int taskNum;
     private int delay;
+    private String worldName;
     private String URL;
     private String VERSION;
     
     static BukkitScheduler scheduler;
+    static Server server;
+    static World world;
     static final Random random = new Random();
     
     File configFile = new File(this.getDataFolder() + "/config.yml");
@@ -63,6 +68,9 @@ public class StormSync extends JavaPlugin
     {
         URL = getConfig().getString("url");
         delay = getConfig().getInt("delay");
+        worldName = getConfig().getString("worldname");
+        server = this.getServer();
+        world = server.getWorld(worldName);
         scheduler = this.getServer().getScheduler();
     }
     
@@ -87,11 +95,48 @@ public class StormSync extends JavaPlugin
                     loadConfig();
                     cs.sendMessage(ChatColor.AQUA + "Storm Sync config reloaded!");
                 }
+                else if(args[0].equalsIgnoreCase("rain")||args[0].equalsIgnoreCase("wet"))
+                {
+                    makeRain();
+                }
+                else if(args[0].equalsIgnoreCase("thunder")||args[0].equalsIgnoreCase("lightning")||args[0].equalsIgnoreCase("storm"))
+                {
+                    makeStorm();
+                }
+                else if(args[0].equalsIgnoreCase("sunny")||args[0].equalsIgnoreCase("clear")||args[0].equalsIgnoreCase("sun"))
+                {
+                    makeSunny();
+                }
                 else
                     cs.sendMessage(ChatColor.RED + "Unknown argument! Try reload or version.");
             }
             return true;
         }
         return false;
+    }
+    
+    public void makeRain()
+    {
+        world.setStorm(true);
+        delay();
+    }
+    
+    public void makeStorm()
+    {
+        world.setThundering(true);
+        delay();
+        world.setThunderDuration(delay+200);
+    }
+    
+    public void makeSunny()
+    {
+        world.setThundering(false);
+        world.setStorm(false);
+        delay();
+    }
+    
+    public void delay()
+    {
+        world.setWeatherDuration(delay+200);
     }
 }
