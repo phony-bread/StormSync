@@ -9,6 +9,7 @@ package frostbyte.plugins.stormsync;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
@@ -51,7 +52,7 @@ public class StormSync extends JavaPlugin
         {
             this.getServer().getLogger().log(Level.WARNING, "Could not connect to MCStats.org, Stats tracking disabled");
         }
-        taskNum = scheduler.scheduleSyncRepeatingTask(this, new Syncer(this), delay, delay);
+        taskNum = scheduler.scheduleSyncRepeatingTask(this, new Syncer(this, world), delay, delay);
     }
     
     @Override
@@ -138,5 +139,10 @@ public class StormSync extends JavaPlugin
     public void delay()
     {
         world.setWeatherDuration(delay+200);
+    }
+    
+    public void makeSnow()
+    {
+       
     }
 }
