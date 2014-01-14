@@ -1,20 +1,33 @@
-Overcast
+Rain:
 Cloudy with showers
+Isolated showers
+Light rain
+
+
+Cloud:
+Overcast
 Variable cloudiness
 Cloudy periods
 Partly cloudy
 Mainly cloudy
-Scattered flurries
-Light Snow
 Cloudy with sunny breaks
-Isolated showers
 A few clouds
+Cloudy with clear breaks
+Foggy
+Fog patches
+
+Sun:
 Sunny
 Clear
-Cloudy with clear breaks
-Few flurries
-Light rain
-Cloudy
 Mainly clear
 Mainly sunny
 
+
+Snow:
+Scattered flurries
+Light Snow
+Few flurries
+
+
+Storm:
+Chance of thunder- showers

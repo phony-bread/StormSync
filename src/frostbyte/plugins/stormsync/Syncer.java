@@ -21,6 +21,5 @@ public class Syncer extends BukkitRunnable
     @Override
     public void run()
     {
-        server.broadcastMessage("Sync called");
     }
 }
