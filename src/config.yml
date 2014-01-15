@@ -1,5 +1,22 @@
 # Storm Sync version 1.0b
 
-delay: 200
+# The time (in seconds) in between weather checks
+delay: 600
+
+# If you are no using a multi-world system, leave this as "world"
 worldname: "world"
-url: "http://www.testing.com/"
+
+# Whether the plugin should begin syncing as soon as it is enabled, or wait for
+# a command.
+startsynced: false
+
+# If you're not debugging, leave this false unless you like console spam...
+log: false
+
+# Should look similar to this:
+    # http://rss.theweathernetwork.com/weather/noxx0029
+# Get from theweathernetwork.com by searching your city
+# and pressing the rss/xml button.
+# For more help visit: 
+    # http://dev.bukkit.org/bukkit-plugins/storm-sync/pages/setup-tutorial/
+url: "http://rss.theweathernetwork.com/weather/noxx0029"

@@ -8,9 +8,15 @@ permissions:
     stormsync.stormsync:
         description: Permission for the /stormsync command
         default: op
+    stormsync.forecast:
+        description: Permission for the /forecast command
+        default: true
 commands:
     stormsync:
         aliases: ss
         description: version recites the version number, reload reloads the config
         permission: stormsync.stormsync
+    forecast:
+        description: sends a 3-day forecast to the player, or broadcasts if executed from console
+        permission: stormsync.forecast
         

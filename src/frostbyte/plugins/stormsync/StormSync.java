@@ -24,7 +24,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 
 public class StormSync extends JavaPlugin
 {
@@ -33,11 +35,13 @@ public class StormSync extends JavaPlugin
     private String worldName;
     private String URL;
     private String VERSION;
-    
+    private boolean shouldSync;
     static BukkitScheduler scheduler;
     static Server server;
     static World world;
+    static boolean log;
     static URL feedUrl;
+    static Logger logger;
     static Fetcher fetcher;
     static ConsoleCommandSender console;
     static List<Message> entries = new ArrayList<>();
@@ -51,8 +55,6 @@ public class StormSync extends JavaPlugin
         VERSION = getDescription().getVersion();
         saveDefaultConfig();
         loadConfig();
-        System.out.println("Delay: " + delay);
-        System.out.println("URL: " + URL);
         try
         {
             MetricsLite metrics = new MetricsLite(this);
@@ -68,13 +70,13 @@ public class StormSync extends JavaPlugin
            fetcher = new Fetcher(feedUrl);
            System.out.println("Feed fetch successful...");
            
+        taskNum = scheduler.scheduleSyncRepeatingTask(this, new Syncer(this, world), delay, delay);
         }
         catch(MalformedURLException e)
         {
-            console.sendMessage(ChatColor.YELLOW + URL + ChatColor.RED + " is an malformed URL. An XML RSS feed is needed. Storm Sync disabled.");
+            console.sendMessage("[StormSync] " + ChatColor.YELLOW + URL + ChatColor.RED + " is a malformed URL. An XML RSS feed is needed. Storm Sync disabled.");
             onDisable();
         }
-        taskNum = scheduler.scheduleSyncRepeatingTask(this, new Syncer(this, world), delay, delay);
     }
     
     @Override
@@ -91,14 +93,17 @@ public class StormSync extends JavaPlugin
     public void loadConfig()
     {
         URL = getConfig().getString("url");
+        shouldSync = getConfig().getBoolean("startsynced");
         delay = getConfig().getInt("delay");
+        delay = delay * 20;
+        log = getConfig().getBoolean("log");
         worldName = getConfig().getString("worldname");
         server = this.getServer();
+        logger = server.getLogger();
         world = server.getWorld(worldName);
         scheduler = this.getServer().getScheduler();
         console = server.getConsoleSender();
     }
-    
     
     @Override
     public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args)
@@ -132,16 +137,55 @@ public class StormSync extends JavaPlugin
                 {
                     makeSunny();
                 }
-                else if(args[0].equalsIgnoreCase("fetch"))
+                else if(args[0].equalsIgnoreCase("sync"))
+                {
+                    Parser.parse(fetcher.fetchFeed(), this);
+                    shouldSync = true;
+                }
+                else if(args[0].equalsIgnoreCase("unsync"))
+                {
+                    shouldSync = false;
+                }
+                else if(args[0].equalsIgnoreCase("synconce"))
+                {
+                    Parser.parse(fetcher.fetchFeed(), this);
+                }
+                else if(args[0].equalsIgnoreCase("testfeed"))
                 {
                     entries = fetcher.fetchFeed();
+                    int i = 0;
                     for(Message m:entries)
                     {
-                        server.broadcastMessage(m.toString() + "\n");
+                        System.out.println("Entry: " + i);
+                        System.out.println("Current: " + m.isCurrent());
+                        System.out.println("Title: " + m.getTitle());
+                        System.out.println("Desc:  " + m.getDesc() + "\n");
+                        i++;
                     }
                 }
                 else
                     cs.sendMessage(ChatColor.RED + "Unknown argument! Try reload or version.");
+            }
+            return true;
+        }
+        else if(cmd.getName().equalsIgnoreCase("forecast"))
+        {
+            entries = fetcher.fetchFeed();
+            if(cs instanceof Player)
+            {
+                for(Message m:entries)
+                {
+                    if(!m.isCurrent())
+                        cs.sendMessage(m.toString());
+                }
+            }
+            else if(cs instanceof ConsoleCommandSender)
+            {
+                for(Message m:entries)
+                {
+                    if(!m.isCurrent())
+                        server.broadcastMessage(m.toString());
+                }
             }
             return true;
         }
@@ -152,6 +196,8 @@ public class StormSync extends JavaPlugin
     {
         world.setStorm(true);
         delay();
+        if(log)
+            logger.log(Level.OFF, "[StormSync] Setting weather to rainy in world: {0}", worldName);
     }
     
     public void makeStorm()
@@ -159,6 +205,8 @@ public class StormSync extends JavaPlugin
         world.setThundering(true);
         delay();
         world.setThunderDuration(delay+200);
+        if(log)
+            logger.log(Level.OFF, "[StormSync] Setting weather to stormy in world: {0}", worldName);
     }
     
     public void makeSunny()
@@ -166,6 +214,8 @@ public class StormSync extends JavaPlugin
         world.setThundering(false);
         world.setStorm(false);
         delay();
+        if(log)
+            logger.log(Level.OFF, "[StormSync] Setting weather to clear in world: {0}", worldName);
     }
     
     public void delay()
@@ -173,8 +223,8 @@ public class StormSync extends JavaPlugin
         world.setWeatherDuration(delay+200);
     }
     
-    public void makeSnow()
+    public boolean shouldSync()
     {
-       
+        return this.shouldSync;
     }
 }

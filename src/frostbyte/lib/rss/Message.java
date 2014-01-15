@@ -20,6 +20,11 @@ public class Message
        return description;
    }
    
+   public boolean isCurrent()
+   {
+       return title.equalsIgnoreCase("Current Weather");
+   }
+   
    @Override
    public String toString()
    {
